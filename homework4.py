@@ -62,6 +62,7 @@ if __name__ == "__main__":
         if inputValue == "" and expectedOutput == "":
             inputValue = []
             expectedOutput = []
+        
         else:
             inputValue = inputValue.split(" ")
             inputValue = [float(i) for i in inputValue]
