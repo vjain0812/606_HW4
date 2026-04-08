@@ -1,5 +1,9 @@
 import csv
 import random
+import time
+import tracemalloc
+import sys
+sys.setrecursionlimit(10000)
 
 class Homework4:
 
@@ -42,6 +46,73 @@ class Homework4:
             arr[0], arr[i] = arr[i], arr[0]
             heapify(arr, i, 0)
         return arr
+
+    def measurePerformance(self):
+            sizes = [10**4, 10**5, 5 * 10**5, 10**6]
+    
+            def generate_input(n, itype):
+                if itype == "random":
+                    return [random.uniform(-1e6, 1e6) for _ in range(n)]
+                elif itype == "sorted":
+                    return [float(i) for i in range(n)]
+                elif itype == "reverse":
+                    return [float(n - i) for i in range(n)]
+                elif itype == "repeated":
+                    vals = [random.uniform(-100, 100) for _ in range(10)]
+                    return [random.choice(vals) for _ in range(n)]
+    
+            input_types = ["random", "sorted", "reverse", "repeated"]
+    
+            print("\nPROBLEM 3: PERFORMANCE ANALYSIS")
+            for itype in input_types:
+                print(f"\nInput type: {itype.upper()}")
+                print(f"{'N':<12} {'QS Time(s)':<15} {'QS Mem(MB)':<15} {'HS Time(s)':<15} {'HS Mem(MB)':<15}")
+                print("-" * 70)
+    
+                for n in sizes:
+                    data = generate_input(n, itype)
+    
+                    qs_time = qs_mem = hs_time = hs_mem = None
+    
+                    try:
+                        tracemalloc.start()
+                        t0 = time.perf_counter()
+                        self.randomQuickSort(data[:])
+                        t1 = time.perf_counter()
+                        _, peak = tracemalloc.get_traced_memory()
+                        tracemalloc.stop()
+                        qs_time = round(t1 - t0, 4)
+                        qs_mem = round(peak / 1024 / 1024, 2)
+                    except RecursionError:
+                        tracemalloc.stop()
+                        qs_time = "RecursionError"
+                        qs_mem = "N/A"
+                        print(f"  [QuickSort] RecursionError encountered at N={n}")
+                    except Exception as e:
+                        tracemalloc.stop()
+                        qs_time = f"Error: {e}"
+                        qs_mem = "N/A"
+    
+                    try:
+                        tracemalloc.start()
+                        t0 = time.perf_counter()
+                        self.heapSort(data[:])
+                        t1 = time.perf_counter()
+                        _, peak = tracemalloc.get_traced_memory()
+                        tracemalloc.stop()
+                        hs_time = round(t1 - t0, 4)
+                        hs_mem = round(peak / 1024 / 1024, 2)
+                    except RecursionError:
+                        tracemalloc.stop()
+                        hs_time = "RecursionError"
+                        hs_mem = "N/A"
+                        print(f"  [HeapSort] RecursionError encountered at N={n}")
+                    except Exception as e:
+                        tracemalloc.stop()
+                        hs_time = f"Error: {e}"
+                        hs_mem = "N/A"
+    
+                    print(f"{n:<12} {str(qs_time):<15} {str(qs_mem):<15} {str(hs_time):<15} {str(hs_mem):<15}")
 
 # Main Function
 # Do not edit the code below
@@ -91,3 +162,5 @@ if __name__ == "__main__":
             print(f"Test Case {row} : PASSED")
         else:
             print(f"Test Case {row}: Failed (Expected : {expectedOutput}, Actual: {actualOutput})")
+    
+    homework4.measurePerformance()
