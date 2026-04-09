@@ -5,6 +5,8 @@ import tracemalloc
 import sys
 sys.setrecursionlimit(10000)
 
+# Note: No AI used in any part of this homework
+
 class Homework4:
 
     # QUESTION 1
